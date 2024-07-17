@@ -39,8 +39,18 @@ jobs:
 
     - name: List All Services
       run: |
-        minikube service list
+        kubectl get svc --all-namespaces
+
+    - name: Find Nginx Service Namespace
+      id: find-namespace
+      run: echo "::set-output name=namespace::$(kubectl get svc --all-namespaces | grep nginx-service | awk '{print $1}')"
 
     - name: Expose Service
       run: |
-        minikube service nginx-service --url || minikube service nginx-service -n $(kubectl get svc --all-namespaces | grep nginx-service | awk '{print $1}') --url
+        namespace=$(echo "${{ steps.find-namespace.outputs.namespace }}")
+        if [ -n "$namespace" ]; then
+          minikube service nginx-service -n $namespace --url
+        else
+          echo "Nginx service not found in any namespace"
+          exit 1
+        fi
