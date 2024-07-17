@@ -34,8 +34,13 @@ jobs:
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
         kubectl get deployments
+        kubectl get services
         kubectl get pods
+
+    - name: List All Services
+      run: |
+        minikube service list
 
     - name: Expose Service
       run: |
-        minikube service nginx-service --url
+        minikube service nginx-service --url || minikube service nginx-service -n $(kubectl get svc --all-namespaces | grep nginx-service | awk '{print $1}') --url
