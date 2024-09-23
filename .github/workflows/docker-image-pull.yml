@@ -1,0 +1,19 @@
+name: Pull Docker Image Anonymously
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pull-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Pull nginx image anonymously
+        run: docker pull nginx:latest
+
+      - name: Run nginx container
+        run: docker run -d -p 80:80 nginx:latest
